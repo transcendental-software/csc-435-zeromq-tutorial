@@ -10,27 +10,56 @@ void Worker::run() {
         auto res = socket.recv(request, zmq::recv_flags::none);
         std::string message = request.to_string();
 
-        if (message.compare("quit") == 0) {
+        if (message.compare("QUIT") == 0) {
             break;
         }
 
-        if (message.compare("addition") == 0) {
-            std::string data{"2+2=4"};
+        if (message.substr(0, 5).compare("INDEX") == 0) {
+            std::string token;
+            std::vector<std::string> tokens;
+            std::stringstream message_stream(message);
+            while (std::getline(message_stream, token, ' ')) {
+                tokens.push_back(token);
+            }
+
+            std::cout << std::endl << "indexing " << tokens[2] << " from " << tokens[1] << std::endl;
+            for (auto i = 3; i < tokens.size(); i += 2) {
+                std::cout << tokens[i] << " " << tokens[i + 1] << std::endl;
+            }
+            std::cout << "completed!" << std::endl;
+
+            std::string data{"OK"};
             socket.send(zmq::buffer(data), zmq::send_flags::none);
+
+            std::cout << "> " << std::flush;
+            
             continue;
         }
 
-        if (message.compare("multiplication") == 0) {
-            std::string data{"2x2=4"};
+        if (message.substr(0, 6).compare("SEARCH") == 0) {
+            std::string token;
+            std::vector<std::string> tokens;
+            std::stringstream message_stream(message);
+            while (std::getline(message_stream, token, ' ')) {
+                tokens.push_back(token);
+            }
+
+            std::cout << std::endl << "searching for " << tokens[0] << std::endl;
+
+            std::string data{"DOC10 20 DOC100 30 DOC1 10"};
             socket.send(zmq::buffer(data), zmq::send_flags::none);
+
+            std::cout << "> " << std::flush;
+            
             continue;
         }
 
-        std::string data{"???"};
+        std::string data{"ERROR"};
         socket.send(zmq::buffer(data), zmq::send_flags::none);
     }
 
-    // Notify the main thread that the worker terminated
-    server.workerTerminated();
+    std::string data{"TERMINATE"};
+    socket.send(zmq::buffer(data), zmq::send_flags::none);
+
     socket.close();
 }

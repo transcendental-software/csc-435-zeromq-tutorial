@@ -1,14 +1,17 @@
 #include <iostream>
+#include <string>
 
 #include <zmq.hpp>
 
 class Client
 {
+    int clientID;
     std::string address;
     std::string port;
 
     public:
-        Client(std::string address, std::string port) : address(address), port(port) { }
+        Client(int clientID, std::string address, std::string port) :
+            clientID(clientID), address(address), port(port) { }
         virtual ~Client() = default;
 
         virtual void run()
@@ -23,18 +26,25 @@ class Client
             std::string data;
             zmq::message_t reply;
 
-            data = "addition";
+            data = "INDEX Client" + std::to_string(clientID) + " DOC11 tiger 100 cat 10 dog 20";
             socket.send(zmq::buffer(data), zmq::send_flags::none);
             auto res = socket.recv(reply, zmq::recv_flags::none);
-            std::cout << reply.to_string() << std::endl;
+            std::cout << "Indexing " << reply.to_string() << std::endl;
 
-            data = "multiplication";
+            data = "SEARCH cat";
             socket.send(zmq::buffer(data), zmq::send_flags::none);
             res = socket.recv(reply, zmq::recv_flags::none);
-            std::cout << reply.to_string() << std::endl;
-
-            data = "quit";
-            socket.send(zmq::buffer(data), zmq::send_flags::none);
+            
+            std::string token;
+            std::vector<std::string> tokens;
+            std::stringstream message_stream(reply.to_string());
+            std::cout << "Searching for cat" << std::endl;
+            while (std::getline(message_stream, token, ' ')) {
+                tokens.push_back(token);
+            }
+            for (auto i = 0; i < tokens.size(); i += 2) {
+                std::cout << tokens[i] << " " << tokens[i + 1] << std::endl;
+            }
 
             socket.close();
             context.close();
@@ -43,15 +53,16 @@ class Client
 
 int main(int argc, char** argv)
 {
-    if (argc != 3) {
-        std::cerr << "USE: ./client <IP address> <port>" << std::endl;
+    if (argc != 4) {
+        std::cerr << "USE: ./client <client ID> <IP address> <port>" << std::endl;
         return 1;
     }
 
-    std::string address(argv[1]);
-    std::string port(argv[2]);
+    std::string clientID(argv[1]);
+    std::string address(argv[2]);
+    std::string port(argv[3]);
 
-    Client client(address, port);
+    Client client(std::stoi(clientID), address, port);
     client.run();
 
     return 0;
