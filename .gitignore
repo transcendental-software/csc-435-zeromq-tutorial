@@ -1,0 +1,7 @@
+.venv
+.vscode
+.idea
+.clion
+app-cpp/build
+app-java/target
+app-java/.idea
