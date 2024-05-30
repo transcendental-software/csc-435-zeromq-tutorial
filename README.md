@@ -13,8 +13,7 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 120
 sudo update-alternatives --remove-all g++
 sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 110
 sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 120
-sudo apt install libzmq3-dev libzmq5
-sudo apt install libczmq-dev libczmq4
+sudo apt install pkg-config libzmq3-dev libzmq5 libczmq-dev libczmq4
 git submodule init
 git submodule update
 ```
@@ -54,7 +53,7 @@ To run the C++ client (after you build the project) use the following command:
 
 Server
 ```
-./build/server 12345 2
+./build/server 12345 4
 > 
 indexing DOC11 from client 1
 tiger 100
@@ -109,7 +108,7 @@ mvn package
 
 To run the Java Server (after you build the project) use the following command:
 ```
-java -cp target/app-java-1.0-SNAPSHOT.jar csc435.app.Server <port>
+java -cp target/app-java-1.0-SNAPSHOT.jar csc435.app.Server <port> <num worker threads>
 > [quit]
 ```
 
@@ -122,7 +121,7 @@ java -cp target/app-java-1.0-SNAPSHOT.jar csc435.app.Client <client ID> <IP addr
 
 Server
 ```
-java -cp target/app-java-1.0-SNAPSHOT.jar csc435.app.Server 12345
+java -cp target/app-java-1.0-SNAPSHOT.jar csc435.app.Server 12345 4
 > 
 indexing DOC11 from client 1
 cat 10
