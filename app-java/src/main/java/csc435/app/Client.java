@@ -5,10 +5,12 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 public class Client {
+    private Integer clientID;
     private String address;
     private Integer port;
 
-    public Client(String address, int port) {
+    public Client(Integer clientID, String address, int port) {
+        this.clientID = clientID;
         this.address = address;
         this.port = port;
     }
@@ -24,30 +26,34 @@ public class Client {
         String message;
         byte[] buffer;
         
-        message = "addition";
+        message = "INDEX Client" + clientID.toString() + " DOC11 tiger 100 cat 10 dog 20";
         socket.send(message.getBytes(ZMQ.CHARSET), 0);
         buffer = socket.recv(0);
-        System.out.println(new String(buffer, ZMQ.CHARSET));
+        message = new String(buffer, ZMQ.CHARSET);
+        System.out.println("Indexing " + message);
 
-        message = "multiplication";
+        message = "SEARCH cat";
         socket.send(message.getBytes(ZMQ.CHARSET), 0);
         buffer = socket.recv(0);
-        System.out.println(new String(buffer, ZMQ.CHARSET));
+        message = new String(buffer, ZMQ.CHARSET);
 
-        message = "quit";
-        socket.send(message.getBytes(ZMQ.CHARSET), 0);
+        System.out.println("Searching for cat");
+        String[] tokens = message.split("\\s+");
+        for (int i = 0; i < tokens.length; i += 2) {
+            System.out.println(tokens[i] + " " + tokens[i + 1]);
+        }
 
         socket.close();
         context.close();
     }
 
     public static void main(String[] args) {
-        if (args.length != 2) {
-            System.err.println("USE: java Client <IP address> <port>");
+        if (args.length != 3) {
+            System.err.println("USE: java Client <client ID> <IP address> <port>");
             System.exit(1);
         }
 
-        Client client = new Client(args[0], Integer.parseInt(args[1]));
+        Client client = new Client(Integer.parseInt(args[0]), args[1], Integer.parseInt(args[2]));
         client.run();
     }
 }

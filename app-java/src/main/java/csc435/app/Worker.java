@@ -5,11 +5,9 @@ import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
 public class Worker implements Runnable {
-    private Server server;
     private ZContext context;
 
-    public Worker(Server server, ZContext context) {
-        this.server = server;
+    public Worker(ZContext context) {
         this.context = context;
     }
 
@@ -23,28 +21,49 @@ public class Worker implements Runnable {
             byte[] buffer = socket.recv(0);
             String message = new String(buffer, ZMQ.CHARSET);
 
-            if (message.compareTo("quit") == 0) {
+            if (message.compareTo("QUIT") == 0) {
                 break;
             }
 
-            if (message.compareTo("addition") == 0) {
-                message = "2+2=4";
+            if (message.substring(0, 5).compareTo("INDEX") == 0) {
+                String[] tokens = message.split("\\s+");
+
+                System.out.println("\nindexing " + tokens[2] + " from " + tokens[1]);
+                for (int i = 3; i < tokens.length; i+=2) {
+                    System.out.println(tokens[i] + " " + tokens[i + 1]);
+                }
+                System.out.println("completed!");
+
+                message = "OK";
                 socket.send(message.getBytes(ZMQ.CHARSET), 0);
+
+                System.out.print("> ");
+                System.out.flush();
+
                 continue;
             }
 
-            if (message.compareTo("multiplication") == 0) {
-                message = "2x2=4";
+            if (message.substring(0, 6).compareTo("SEARCH") == 0) {
+                String[] tokens = message.split("\\s+");
+
+                System.out.println("\nsearching for " + tokens[0]);
+
+                message = "DOC10 20 DOC100 30 DOC1 10";
                 socket.send(message.getBytes(ZMQ.CHARSET), 0);
+
+                System.out.print("> ");
+                System.out.flush();
+
                 continue;
             }
 
-            message = "???";
+            message = "ERROR";
             socket.send(message.getBytes(ZMQ.CHARSET), 0);
         }
 
-        // Notify the main thread that the worker terminated
-        server.workerTerminate();
+        String message = "TERMINATE";
+        socket.send(message.getBytes(ZMQ.CHARSET), 0);
+
         socket.close();
     }
 }

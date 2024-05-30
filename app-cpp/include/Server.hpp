@@ -16,8 +16,8 @@ class Server
     std::thread ZMQthread;
     
     public:
-        Server(std::string port, int numWorkers) : 
-            address("*"), port(port), numWorkers(numWorkers), context(4) { }
+        Server(std::string address, std::string port, int numWorkers) : 
+            address(address), port(port), numWorkers(numWorkers) { }
         virtual ~Server() = default;
 
         virtual void startZMQServer();

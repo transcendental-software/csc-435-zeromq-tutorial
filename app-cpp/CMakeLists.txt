@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(sockets
         VERSION 1.0
-        DESCRIPTION "C++ Client-Server Sockets Example"
+        DESCRIPTION "C++ Client-Server ZeroMQ Sockets Example"
         LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)

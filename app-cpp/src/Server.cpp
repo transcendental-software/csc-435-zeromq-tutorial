@@ -90,7 +90,7 @@ int main(int argc, char** argv)
     std::string port(argv[1]);
     int numWorkers(std::atoi(argv[2]));
 
-    Server server(port, numWorkers);
+    Server server("*", port, numWorkers);
     server.startZMQServer();
 
     std::string command;
