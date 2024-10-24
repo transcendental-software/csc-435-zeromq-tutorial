@@ -3,25 +3,22 @@
 
 ### Requirements
 
-To run the C++ programs you will need to have GCC 12.x and CMake 3.22.x installed on your system. You will also need to install the C/C++ ZeroMQ libraries and development files. On Ubuntu 22.04 you can install GCC, CMake and ZeroMQ, and set GCC as default compiler using the following commands:
-
+To run the C++ programs you will need to have GCC 14.x and CMake 3.28.x installed on your system. You will also need to install the ZeroMQ libraries and development files. On Ubuntu 24.04 LTS you can install GCC and set it as default compiler using the following commands:
 ```
-sudo apt install g++-12 gcc-12 cmake
+sudo apt install build-essential cmake g++-14 gcc-14 cmake
 sudo update-alternatives --remove-all gcc
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 120
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 140
 sudo update-alternatives --remove-all g++
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 110
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 120
-sudo apt install pkg-config libzmq3-dev libzmq5 libczmq-dev libczmq4
-git submodule init
-git submodule update
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 130
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 140
+sudo apt install pkg-config libzmq3-dev libzmq5 libczmq-dev libczmq4 cppzmq-dev
 ```
 
-To run the Java programs you will need to have Java 1.7.x and Maven 3.6.x installed on your systems. You will also need to install the JeroMQ (Java ZeroMQ) library and development jar. On Ubuntu 22.04 you can install Java, Maven and JeroMQ using the following commands:
+To run the Java programs you will need to have Java 21.x and Maven 3.8.x installed on your systems. You will also need to install the JeroMQ (Java ZeroMQ) library and development jar. On Ubuntu 24.04 LTS you can install Java, Maven and JeroMQ using the following commands:
 
 ```
-sudo apt install openjdk-17-jdk maven libjeromq-java
+sudo apt install openjdk-21-jdk maven libjeromq-java
 
 ```
 
@@ -33,7 +30,7 @@ To build the C++ solution use the following commands:
 cd app-cpp
 mkdir build
 cmake -S . -B build
-cmake --build build
+cmake --build build --config Release
 ```
 
 #### How to run application
