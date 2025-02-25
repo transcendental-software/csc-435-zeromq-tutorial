@@ -40,10 +40,8 @@ public class Server {
             socket.connect("tcp://127.0.0.1" + ":" + port);
 
             String message = "QUIT";
-            byte[] buffer;
             
             socket.send(message.getBytes(ZMQ.CHARSET), 0);
-            buffer = socket.recv(0);
 
             socket.close();
             context.close();
