@@ -28,7 +28,7 @@ public class Worker implements Runnable {
             if (message.substring(0, 5).compareTo("INDEX") == 0) {
                 String[] tokens = message.split("\\s+");
 
-                System.out.println("\nindexing " + tokens[2] + " from " + tokens[1]);
+                System.out.println("\nindexing " + tokens[2] + " from client " + tokens[1]);
                 for (int i = 3; i < tokens.length; i+=2) {
                     System.out.println(tokens[i] + " " + tokens[i + 1]);
                 }

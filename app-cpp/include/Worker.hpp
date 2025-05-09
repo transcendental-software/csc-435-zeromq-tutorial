@@ -5,8 +5,6 @@
 
 #include <zmq.hpp>
 
-#include "Server.hpp"
-
 class Worker
 {
     zmq::context_t& context;

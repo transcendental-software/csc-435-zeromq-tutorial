@@ -26,7 +26,7 @@ public class Client {
         String message;
         byte[] buffer;
         
-        message = "INDEX Client" + clientID.toString() + " DOC11 tiger 100 cat 10 dog 20";
+        message = "INDEX " + clientID.toString() + " DOC11 tiger 100 cat 10 dog 20";
         socket.send(message.getBytes(ZMQ.CHARSET), 0);
         buffer = socket.recv(0);
         message = new String(buffer, ZMQ.CHARSET);

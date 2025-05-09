@@ -22,7 +22,7 @@ void Worker::run() {
                 tokens.push_back(token);
             }
 
-            std::cout << std::endl << "indexing " << tokens[2] << " from " << tokens[1] << std::endl;
+            std::cout << std::endl << "indexing " << tokens[2] << " from client " << tokens[1] << std::endl;
             for (auto i = 3; i < tokens.size(); i += 2) {
                 std::cout << tokens[i] << " " << tokens[i + 1] << std::endl;
             }

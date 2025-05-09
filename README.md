@@ -51,6 +51,7 @@ To run the C++ client (after you build the project) use the following command:
 Server
 ```
 ./build/server 12345 4
+ZeroMQ Server started!
 > 
 indexing DOC11 from client 1
 tiger 100
@@ -68,7 +69,7 @@ completed!
 > 
 searching for cat
 > quit
-Server terminated!
+ZeroMQ Server terminated!
 ```
 
 Client 1
@@ -119,6 +120,7 @@ java -cp target/app-java-1.0-SNAPSHOT.jar csc435.app.Client <client ID> <IP addr
 Server
 ```
 java -cp target/app-java-1.0-SNAPSHOT.jar csc435.app.Server 12345 4
+ZeroMQ Server started!
 > 
 indexing DOC11 from client 1
 cat 10
@@ -136,7 +138,7 @@ completed!
 > 
 searching for cat
 > quit
-Server terminated!
+ZeroMQ Server terminated!
 ```
 
 Client 1

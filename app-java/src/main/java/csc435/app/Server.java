@@ -1,19 +1,19 @@
 package csc435.app;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
-public class Server {
+public class Server implements Runnable {
     
     private String address;
     private String port;
     private Integer numWorkers;
 
     private ZContext context;
-    private Thread proxyThread;
 
     public Server(String address, String port, int numWorkers) {
         this.address = address;
@@ -21,16 +21,46 @@ public class Server {
         this.numWorkers = numWorkers;
     }
 
-    public void startZMQServer() {
-        // ZMQ context initialized with 4 IO threads
-        context = new ZContext(4);
+    @Override
+    public void run() {
+        ArrayList<Thread> threads = new ArrayList<Thread>();
 
-        ZMQProxyWorker proxyWorker = new ZMQProxyWorker(context, address, port, numWorkers);
-        proxyThread = new Thread(proxyWorker);
-        proxyThread.start();
+        // ZMQ context initialized with 4 IO threads
+        context = new ZContext(numWorkers);
+        
+        // Create ZMQ router and dealer sockets
+        ZMQ.Socket routerSocket = context.createSocket(SocketType.ROUTER);
+        ZMQ.Socket dealerSocket = context.createSocket(SocketType.DEALER);
+
+        // Bind the router socket to the server listening address and port
+        // Bind the dealer socket to worker internal communcation channel
+        routerSocket.bind("tcp://" + address + ":" + port);
+        dealerSocket.bind("inproc://workers");
+
+        for (int i = 0; i < numWorkers; i++) {
+            Worker worker = new Worker(context);
+            Thread thread = new Thread(worker);
+            thread.start();
+            threads.add(thread);
+        }
+
+        // Create the ZMQ queue that forwards messages between the router and the dealer
+        ZMQ.proxy(routerSocket, dealerSocket, null);
+
+        try {
+            for (int i = 0; i < numWorkers; i++) {
+                threads.get(i).join();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        routerSocket.close();
+        dealerSocket.close();
+        context.close();
     }
 
-    public void stopZMQServer() {
+    public void shutdown() {
         for (int i = 0; i < numWorkers; i++) {
             // Create ZMQ context with 1 IO thread
             ZContext context = new ZContext(1);
@@ -42,18 +72,13 @@ public class Server {
             String message = "QUIT";
             
             socket.send(message.getBytes(ZMQ.CHARSET), 0);
+            socket.recv(0);
 
             socket.close();
             context.close();
         }
 
-        this.context.destroy();
-
-        try {
-            proxyThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        context.destroy();
     }
 
     public static void main(String[] args) {
@@ -63,19 +88,26 @@ public class Server {
         }
 
         Server server = new Server("*", args[0], Integer.parseInt(args[1]));
-        server.startZMQServer();
+        Thread serverThread = new Thread(server);
+        serverThread.start();
 
         Scanner sc = new Scanner(System.in);
         String command;
 
+        System.out.println("ZeroMQ Server started!");
         while (true) {
             System.out.print("> ");
             
             command = sc.nextLine();
             
             if (command.compareTo("quit") == 0) {
-                server.stopZMQServer();
-                System.out.println("Server terminated!");
+                server.shutdown();
+                try {
+                    serverThread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("ZeroMQ Server terminated!");
                 break;
             }
         }

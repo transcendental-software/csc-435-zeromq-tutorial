@@ -26,7 +26,7 @@ class Client
             std::string data;
             zmq::message_t reply;
 
-            data = "INDEX Client" + std::to_string(clientID) + " DOC11 tiger 100 cat 10 dog 20";
+            data = "INDEX " + std::to_string(clientID) + " DOC11 tiger 100 cat 10 dog 20";
             socket.send(zmq::buffer(data), zmq::send_flags::none);
             auto res = socket.recv(reply, zmq::recv_flags::none);
             std::cout << "Indexing " << reply.to_string() << std::endl;
